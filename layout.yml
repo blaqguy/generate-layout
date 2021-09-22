@@ -19,13 +19,13 @@ steps:
 
   - name: unit-test
     expected_materials: [ ["MATCH", "*", "WITH", "PRODUCTS", "FROM", "checkout"] ]
-    expected_products: []
+    expected_products: [ ["CREATE", "__pycache__"] ]
     expected_command: ["python3", "test.py", "-v"]
     threshold: 1
 
   - name: package
-    expected_materials: [ ["MATCH", "*", "WITH", "PRODUCTS", "FROM", "checkout"] ]
-    expected_products: []
+    expected_materials: [ ["MATCH", "*", "WITH", "PRODUCTS", "FROM", "unit-test"] ]
+    expected_products: [ ["CREATE", "helloworld.tar"] ]
     expected_command: [ "tar", "cfvz", "helloworld.tar", "*" ]
     threshold: 1
 
@@ -35,6 +35,6 @@ inspect:
       ["MATCH", "*", "WITH", "PRODUCTS", "FROM", "package"],
       ["DISALLOW", "*"] ]
     expected_products: [
-      ["MATCH", "*", "WITH", "PRODUCTS", "FROM", "checkout"],
+      ["MATCH", "*", "WITH", "PRODUCTS", "FROM", "package"],
       ["DISALLOW", "*"] ]
     run: [ "tar", "xzf", "helloworld.tar" ]
