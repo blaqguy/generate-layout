@@ -1,0 +1,40 @@
+_type: layout
+steps:
+  - name: checkout
+    expected_materials: []
+    expected_products: [
+      ["CREATE", "*.py"],
+      ["CREATE", "*.pub"],
+      ["CREATE", "*.md"],
+      ["CREATE", "root.layout"],
+      ["DISALLOW", "*" ]]
+    expected_command: [ "git", "clone", "https://github.com/blaqguy/in-toto-demo.git" ]
+    threshold: 1
+
+  - name: lint
+    expected_materials: [ ["MATCH", "*", "WITH", "PRODUCTS", "FROM", "checkout"] ]
+    expected_products: []
+    expected_command: [ "find", ".", "-type", "f", "-name", "*.py", "|", "xargs", "pylint", "--exit-zero" ]
+    threshold: 1
+
+  - name: unit-test
+    expected_materials: [ ["MATCH", "*", "WITH", "PRODUCTS", "FROM", "checkout"] ]
+    expected_products: []
+    expected_command: ["python3", "test.py", "-v"]
+    threshold: 1
+
+  - name: package
+    expected_materials: [ ["MATCH", "*", "WITH", "PRODUCTS", "FROM", "checkout"] ]
+    expected_products: []
+    expected_command: [ "tar", "cfvz", "helloworld.tar", "*" ]
+    threshold: 1
+
+inspect:
+  - name: untar
+    expected_materials: [
+      ["MATCH", "*", "WITH", "PRODUCTS", "FROM", "package"],
+      ["DISALLOW", "*"] ]
+    expected_products: [
+      ["MATCH", "*", "WITH", "PRODUCTS", "FROM", "checkout"],
+      ["DISALLOW", "*"] ]
+    run: [ "tar", "xzf", "helloworld.tar" ]
